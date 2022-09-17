@@ -18,6 +18,21 @@
             "events": [],
             "schedule": "",
             "timeout": 15
+        },
+        {
+            "$id": "postShoutout",
+            "name": "postShoutout",
+            "runtime": "node-16.0",
+            "path": "functions/postShoutout",
+            "entrypoint": "src/index.js",
+            "ignore": [
+                "node_modules",
+                ".npm"
+            ],
+            "execute": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 15
         }
     ],
     "collections": [
@@ -47,6 +62,24 @@
                     "required": true,
                     "array": false,
                     "size": 280,
+                    "default": null
+                },
+                {
+                    "key": "status",
+                    "type": "string",
+                    "status": "available",
+                    "required": true,
+                    "array": false,
+                    "size": 32,
+                    "default": null
+                },
+                {
+                    "key": "revolutOrderId",
+                    "type": "string",
+                    "status": "available",
+                    "required": false,
+                    "array": false,
+                    "size": 255,
                     "default": null
                 }
             ],
