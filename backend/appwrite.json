@@ -1,0 +1,56 @@
+{
+    "projectId": "almostShoutcart",
+    "projectName": "Almost Shoutcart",
+    "functions": [
+        {
+            "$id": "createOrder",
+            "name": "createOrder",
+            "runtime": "node-16.0",
+            "path": "functions/createOrder",
+            "entrypoint": "src/index.js",
+            "ignore": [
+                "node_modules",
+                ".npm"
+            ],
+            "execute": [
+                "users"
+            ],
+            "events": [],
+            "schedule": "",
+            "timeout": 15
+        }
+    ],
+    "collections": [
+        {
+            "$id": "orders",
+            "$createdAt": "2022-09-17T14:10:21.090+00:00",
+            "$updatedAt": "2022-09-17T14:10:21.090+00:00",
+            "$permissions": [],
+            "databaseId": "main",
+            "name": "Orders",
+            "enabled": true,
+            "documentSecurity": false,
+            "attributes": [
+                {
+                    "key": "userId",
+                    "type": "string",
+                    "status": "available",
+                    "required": true,
+                    "array": false,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "msg",
+                    "type": "string",
+                    "status": "available",
+                    "required": true,
+                    "array": false,
+                    "size": 280,
+                    "default": null
+                }
+            ],
+            "indexes": []
+        }
+    ]
+}

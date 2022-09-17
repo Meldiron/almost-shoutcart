@@ -20,8 +20,19 @@ export class AppwriteService {
     }
 
     static async createOrder(msg: string) {
-        const res = await functions.createExecution('createOrder', msg, true);
-        console.log(res);
+        const res = await functions.createExecution('createOrder', msg);
+
+        if (res.status === 'failed') {
+            throw new Error('Unexpected error.');
+        }
+
+        const data = JSON.parse(res.response);
+
+        if (!data.success) {
+            throw new Error(data.msg);
+        }
+
+        window.location.href = data.url;
     }
 
     static async fetchAccount() {

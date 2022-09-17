@@ -19,8 +19,9 @@
 	<h3>Buy shoutout</h3>
 
 	<p>
-		Once purchased, we will instantly post your message on behalf of our <a href="" target="_blank"
-			>Twitter account</a
+		Once purchased, we will instantly post your message on behalf of our <a
+			href="https://twitter.com/almostshoutcart"
+			target="_blank">Twitter account</a
 		>.
 	</p>
 
