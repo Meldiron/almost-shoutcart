@@ -1,4 +1,4 @@
-import { Client, Account, ID, Functions } from 'appwrite';
+import { Client, Account, ID, Functions, Query, Databases } from 'appwrite';
 import { accountStore } from './accountStore';
 
 const client = new Client()
@@ -7,6 +7,7 @@ const client = new Client()
 
 const account = new Account(client);
 const functions = new Functions(client);
+const database = new Databases(client);
 
 export class AppwriteService {
     static login() {
@@ -32,7 +33,36 @@ export class AppwriteService {
             throw new Error(data.msg);
         }
 
-        window.location.href = data.url;
+        return data.url;
+    }
+
+    static async verifyOrder(orderId: string) {
+        const res = await functions.createExecution('verifyPayment', orderId);
+
+        if (res.status === 'failed') {
+            throw new Error('Unexpected error.');
+        }
+
+        const data = JSON.parse(res.response);
+
+        if (!data.success) {
+            throw new Error(data.msg);
+        }
+
+        return data;
+    }
+
+    static async getOrders(cursor?: string) {
+        const queries = [
+            Query.orderDesc('$createdAt')
+        ];
+
+        if (cursor) {
+            queries.push(Query.cursorAfter(cursor));
+        }
+
+        const res = await database.listDocuments('main', 'orders', queries);
+        return res.documents;
     }
 
     static async fetchAccount() {

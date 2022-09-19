@@ -25,8 +25,7 @@ module.exports = async function (req, res) {
   }
 
   const client = new sdk.Client();
-
-  let database = new sdk.Databases(client);
+  const database = new sdk.Databases(client);
 
   if (
     !req.variables['APPWRITE_FUNCTION_ENDPOINT'] ||
@@ -46,12 +45,14 @@ module.exports = async function (req, res) {
     userId: req.variables['APPWRITE_FUNCTION_USER_ID'],
     msg: req.payload,
     status: 'CREATED'
-  });
+  }, [
+    sdk.Permission.read(sdk.Role.user(req.variables['APPWRITE_FUNCTION_USER_ID']))
+  ]);
 
   const revolutResponse = await (await fetch(req.variables['REVOLUT_ENDPOINT'] + '/api/1.0/orders', {
     method: 'POST',
     body: JSON.stringify({
-      amount: 99,
+      amount: 1,
       currency: 'EUR',
       capture_mode: 'MANUAL',
       merchant_order_ext_ref: order.$id
@@ -64,6 +65,7 @@ module.exports = async function (req, res) {
 
   await database.updateDocument('main', 'orders', order.$id, {
     revolutOrderId: revolutResponse.id,
+    revolutPaymentUrl: revolutResponse.checkout_url,
     status: 'PENDING'
   });
 
