@@ -110,7 +110,7 @@
 		<div class="mt-2">
 			<small
 				>Payment is done in a production environment. You will pay 0.01€. Sadly, both 0.00€ payment
-				and Revolut sandbox is broken. This is the only way.</small
+				and Revolut sandbox are broken. This is the only way.</small
 			>
 		</div>
 	</form>
