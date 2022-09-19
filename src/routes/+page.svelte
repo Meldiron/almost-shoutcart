@@ -52,19 +52,45 @@
 <hr />
 
 {#if !$accountStore}
-	<p>Login first!</p>
+	<p>
+		This is a demo app showcasing Appwrite + Online payments. In this demo we will use <a
+			href="https://www.revolut.com/"
+			target="_blank">Revolut</a
+		> as our payment gateway. It supports Revolut Pay, Google Pay, Apple Pay and card payments.
+	</p>
+
+	<p>
+		Revolut does not support redirect URLs, so instead of fetching status after reditect, there will
+		be button to 'Verify Payment'. We also verify all pending payments every 60 minutes.
+	</p>
+
+	<p>Login first! <small class="text text-sm text-secondary">(look above)</small></p>
 {:else}
 	<p>Welcome!</p>
+
+	<hr />
+
+	<p>
+		This is a demo app showcasing Appwrite + Online payments. In this demo we will use <a
+			href="https://www.revolut.com/"
+			target="_blank">Revolut</a
+		> as our payment gateway. It supports Revolut Pay, Google Pay, Apple Pay and card payments.
+	</p>
+
+	<p>
+		Revolut does not support redirect URLs, so instead of fetching status after reditect, there will
+		be button to 'Verify Payment'. We also verify all pending payments every 60 minutes.
+	</p>
 
 	<hr />
 
 	<h3>Buy shoutout</h3>
 
 	<p>
-		Once purchased, we will instantly post your message on our <a
+		Once purchased, verify payment. We will post your message on our <a
 			href="https://discord.gg/3sAmyqN6Ud"
 			target="_blank">Discord Server</a
-		>.
+		> after successful verification.
 	</p>
 
 	<form on:submit|preventDefault={createOrder}>
