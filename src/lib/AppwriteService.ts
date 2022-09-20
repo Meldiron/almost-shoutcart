@@ -2,7 +2,7 @@ import { Client, Account, ID, Functions, Query, Databases } from 'appwrite';
 import { accountStore } from './accountStore';
 
 const client = new Client()
-    .setEndpoint('https://demo.appwrite.io/v1')
+    .setEndpoint('https://appwrite.almost-shoutcart.matejbaco.eu/v1')
     .setProject('almostShoutcart');
 
 const account = new Account(client);
