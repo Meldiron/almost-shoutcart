@@ -1,6 +1,6 @@
 {
     "projectId": "almostShoutcart",
-    "projectName": "Almost Shoutcart",
+    "projectName": "Almost Shoutcart V1",
     "functions": [
         {
             "$id": "createOrder",
