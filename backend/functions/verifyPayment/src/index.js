@@ -93,7 +93,7 @@ module.exports = async function (req, res) {
     const orderId = req.payload;
     const order = await database.getDocument('main', 'orders', orderId);
 
-    if (!order.attempts >= 5) {
+    if (order.attempts >= 5) {
       res.json({
         success: false,
         msg: "You can no longer verify this payment to prevent spam. Please contact us.",

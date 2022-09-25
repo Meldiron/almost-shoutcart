@@ -1,5 +1,6 @@
 import { Client, Account, ID, Functions, Query, Databases } from 'appwrite';
 import { accountStore } from './accountStore';
+import { loadingStore } from './loadingStore';
 
 const client = new Client()
     .setEndpoint('https://appwrite.almost-shoutcart.matejbaco.eu/v1')
@@ -13,56 +14,92 @@ export class AppwriteService {
     static login() {
         const redirectUrl = window.location.href;
         account.createOAuth2Session("github", redirectUrl, redirectUrl);
+        loadingStore.set({ state: true, msg: "Redirecting ..." });
     }
 
     static async logout() {
-        await account.deleteSession('current');
-        await AppwriteService.fetchAccount();
+        loadingStore.set({ state: true, msg: "Logging out ..." });
+
+        try {
+            await account.deleteSession('current');
+            await AppwriteService.fetchAccount();
+        } catch(err: any) {
+            alert(err.message);
+        } finally {
+            loadingStore.set({ state: false });
+        }
     }
 
     static async createOrder(msg: string) {
-        const res = await functions.createExecution('createOrder', msg);
+        loadingStore.set({ state: true, msg: "Creating order ..." });
 
-        if (res.status === 'failed') {
-            throw new Error('Unexpected error.');
+        try {
+            const res = await functions.createExecution('createOrder', msg);
+
+            if (res.status === 'failed') {
+                throw new Error('Unexpected error.');
+            }
+    
+            const data = JSON.parse(res.response);
+    
+            if (!data.success) {
+                throw new Error(data.msg);
+            }
+        
+            return { url: data.url, id: data.orderId };
+        } catch(err: any) {
+            alert(err.message);
+        } finally {
+            loadingStore.set({ state: false });
         }
-
-        const data = JSON.parse(res.response);
-
-        if (!data.success) {
-            throw new Error(data.msg);
-        }
-
-        return data.url;
+        
+        return null;
     }
 
     static async verifyOrder(orderId: string) {
-        const res = await functions.createExecution('verifyPayment', orderId);
+        loadingStore.set({ state: true, msg: "Verifying order ..." });
 
-        if (res.status === 'failed') {
-            throw new Error('Unexpected error.');
+        try {
+            const res = await functions.createExecution('verifyPayment', orderId);
+
+            if (res.status === 'failed') {
+                throw new Error('Unexpected error.');
+            }
+    
+            const data = JSON.parse(res.response);
+    
+            if (!data.success) {
+                throw new Error(data.msg);
+            }
+    
+            return data;
+        } catch(err: any) {
+            alert(err.message);
+        } finally {
+            loadingStore.set({ state: false});
         }
 
-        const data = JSON.parse(res.response);
-
-        if (!data.success) {
-            throw new Error(data.msg);
-        }
-
-        return data;
+        return null;
     }
 
     static async getOrders(cursor?: string) {
-        const queries = [
-            Query.orderDesc('$createdAt')
-        ];
-
-        if (cursor) {
-            queries.push(Query.cursorAfter(cursor));
+        try {
+            const queries = [
+                Query.orderDesc('$createdAt')
+            ];
+    
+            if (cursor) {
+                queries.push(Query.cursorAfter(cursor));
+            }
+    
+            const res = await database.listDocuments('main', 'orders', queries);
+            return res.documents;
+        } catch(err: any) {
+            alert(err.message);
+        } finally {
         }
 
-        const res = await database.listDocuments('main', 'orders', queries);
-        return res.documents;
+        return null;
     }
 
     static async fetchAccount() {

@@ -1,102 +1,63 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { accountStore } from '$lib/accountStore';
 	import { AppwriteService } from '$lib/AppwriteService';
-	import { onMount } from 'svelte';
+	import { loadingStore } from '$lib/loadingStore';
 
 	let msg = '';
 
-	let orders: any[] | null = null;
-	let hasMore = true;
-
-	async function refreshOrders() {
-		orders = [];
-		hasMore = true;
-
-		orders = await AppwriteService.getOrders();
-		hasMore = orders.length > 0;
-	}
-
-	onMount(async () => {
-		await refreshOrders();
-	});
-
 	async function createOrder() {
-		const url = await AppwriteService.createOrder(msg);
+		const res = await AppwriteService.createOrder(msg);
 
-		await refreshOrders();
+		if(res) {
+        	loadingStore.set({ state: true, msg: "Finish order. When done, close the payment window." });
+			const win = window.open(res.url, '_blank');
 
-		window.open(url, '_blank')?.focus();
-	}
+			if(!win) {
+        		loadingStore.set({ state: false });
+				return;
+			}
 
-	function verifyOrder(orderId: string) {
-		return async () => {
-			const data = await AppwriteService.verifyOrder(orderId);
-			await refreshOrders();
-			console.log(data);
-		};
-	}
-
-	async function loadPage() {
-		if (!orders || orders.length < 0) {
-			return;
+			const timer = setInterval(async () => {
+				if (win.closed) {
+					clearInterval(timer);
+					await AppwriteService.verifyOrder(res.id);
+        			loadingStore.set({ state: false });
+					goto('/purchase-history');
+				}
+			}, 500);
+			
+			win.focus();
 		}
-
-		const newOrders = await AppwriteService.getOrders(orders[orders.length - 1].$id);
-		hasMore = newOrders.length > 0;
-		orders.push(...newOrders);
 	}
 </script>
 
-<h1>Homepage</h1>
+<div class="bg-dark p-5 rounded">
+    <div class="col-sm-8">
+      <h1 class="text-light display-5 fw-normal">This Is a Demo App!</h1>
+      <p class="text-light">This application includes online payments, but everything is in <b>sandbox environment</b>. All purchases are fake. Do <b>not</b> enter real data. </p>
 
-<hr />
+	  <hr>
 
-{#if !$accountStore}
-	<p>
-		This is a demo app showcasing Appwrite + Online payments. In this demo we will use <a
-			href="https://www.revolut.com/"
-			target="_blank">Revolut</a
-		> as our payment gateway. It supports Revolut Pay, Google Pay, Apple Pay and card payments.
-	</p>
+	  <p class="text-light">You will see showcase of <a href="https://appwrite.io/">Appwrite</a> and <a href="https://www.revolut.com/business/business-account/">Revolut Pay</a> working together.</p>
+  </div>
+</div>
 
-	<p>
-		Revolut does not support redirect URLs, so instead of fetching status after reditect, there will
-		be button to 'Verify Payment'. We also verify all pending payments every 60 minutes.
-	</p>
 
-	<p>Login first! <small class="text text-sm text-secondary">(look above)</small></p>
-{:else}
-	<p>Welcome!</p>
-
-	<hr />
-
-	<p>
-		This is a demo app showcasing Appwrite + Online payments. In this demo we will use <a
-			href="https://www.revolut.com/"
-			target="_blank">Revolut</a
-		> as our payment gateway. It supports Revolut Pay, Google Pay, Apple Pay and card payments.
-	</p>
-
-	<p>
-		Revolut does not support redirect URLs, so instead of fetching status after reditect, there will
-		be button to 'Verify Payment'. We also verify all pending payments every 60 minutes.
-	</p>
-
-	<hr />
-
-	<h3>Buy shoutout</h3>
-
-	<p>
+<div class="mt-5">
+	<h4 class="mb-1">Buy Shoutout</h4>
+	<p class="mb-3">
 		Once purchased, verify payment. We will post your message on our <a
 			href="https://discord.gg/3sAmyqN6Ud"
 			target="_blank">Discord Server</a
 		> after successful verification.
 	</p>
 
-	<form on:submit|preventDefault={createOrder}>
-		<div class="form-group mb-2">
-			<label for="yourMessage">Your message</label>
-			<textarea
+	{#if $accountStore}
+	<form on:submit|preventDefault={createOrder} class="needs-validation">
+		<div class="col-12">
+		  <label for="yourMessage" class="form-label">Your Message</label>
+		  <textarea
 				bind:value={msg}
 				required={true}
 				maxlength="280"
@@ -105,46 +66,18 @@
 				rows="3"
 			/>
 		</div>
-		<button type="submit" class="btn btn-primary">Buy for 0.01€</button>
 
-		<div class="mt-2">
+	  <button class="w-100 btn btn-primary btn-lg mt-3" type="submit">Purchase for 0.99€</button>
+
+		<div class="mt-2 text-center">
 			<small
-				>Payment is done in a production environment. You will pay 0.01€. Sadly, both 0.00€ payment
-				and Revolut sandbox are broken. This is the only way.</small
+				>Payments are fake. Just click 'Revolut Pay' and confirm. That's it.</small
 			>
 		</div>
 	</form>
-
-	<hr />
-
-	<h3>Order History</h3>
-
-	{#if orders === null}
-		<p>Loading ...</p>
 	{:else}
-		{#if orders.length <= 0}
-			<p>No orders in your history.</p>
-		{/if}
-
-		<ul>
-			{#each orders as order}
-				<li>
-					<b>[{order.status}]</b>
-					{order.msg} <small>({order.$createdAt}) - ATTEMPTS {order.attempts}/5</small>
-
-					{#if order.status === 'PENDING'}
-						<a target="_blank" href={order.revolutPaymentUrl}
-							><button class="btn btn-success btn-sm">Pay using Revolut</button></a
-						><button on:click={verifyOrder(order.$id)} class="btn btn-warning btn-sm"
-							>Verify payment</button
-						>
-					{/if}
-				</li>
-			{/each}
-		</ul>
-
-		{#if hasMore}
-			<button on:click={loadPage} class="btn btn-secondary">Load more</button>
-		{/if}
+	<div class="alert alert-warning" role="alert">
+		Please sign in in order to purchase a shoutout.
+	  </div>
 	{/if}
-{/if}
+  </div>

@@ -52,7 +52,7 @@ module.exports = async function (req, res) {
   const revolutResponse = await (await fetch(req.variables['REVOLUT_ENDPOINT'] + '/api/1.0/orders', {
     method: 'POST',
     body: JSON.stringify({
-      amount: 1,
+      amount: 99,
       currency: 'EUR',
       capture_mode: 'MANUAL',
       merchant_order_ext_ref: order.$id
@@ -71,6 +71,7 @@ module.exports = async function (req, res) {
 
   res.json({
     success: true,
-    url: revolutResponse.checkout_url
+    url: revolutResponse.checkout_url,
+    orderId: order.$id
   });
 };
