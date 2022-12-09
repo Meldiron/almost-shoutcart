@@ -32,7 +32,7 @@ module.exports = async function (req, res) {
   await fetch(req.variables['DISCORD_WEBHOOK_URL'], {
     method: 'POST',
     body: JSON.stringify({
-      "content": "**" + req.payload + "**\n\n> To buy your own shoutout, visit <https://almost-shoutcart.vercel.app/>",
+      "content": "**" + req.payload + "**\n\n> To buy your own shoutout, visit <https://shoutcart.almostapps.eu/>",
       "embeds": null,
       "attachments": []
     }),

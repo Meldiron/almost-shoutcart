@@ -2,8 +2,10 @@ import { Client, Account, ID, Functions, Query, Databases } from 'appwrite';
 import { accountStore } from './accountStore';
 import { loadingStore } from './loadingStore';
 
+const endpoint = 'https://backend.shoutcart.almostapps.eu/v1';
+
 const client = new Client()
-    .setEndpoint('https://appwrite.almost-shoutcart.matejbaco.eu/v1')
+    .setEndpoint(endpoint)
     .setProject('almostShoutcart');
 
 const account = new Account(client);
